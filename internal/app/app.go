@@ -2,7 +2,7 @@ package app
 
 import (
 	"auth/internal/config"
-	"auth/internal/delivery"
+	"auth/internal/handler"
 	"auth/internal/repository"
 	"auth/internal/server"
 	"auth/internal/service"
@@ -34,13 +34,15 @@ func Run(configPath string) {
 
 	// Initializing env variables
 	if err := godotenv.Load(); err != nil {
-		logrus.Fatal("Error loading .env file")
+		logrus.Error("Error loading .env file")
+		return
 	}
 
 	// Initializing config
 	cfg, err := config.Init(configPath)
 	if err != nil {
-		logrus.Fatalf("Unable to parse config: %v", err)
+		logrus.Error("Unable to parse config", err)
+		return
 	}
 
 	// Initializing postgres
@@ -52,14 +54,16 @@ func Run(configPath string) {
 		DBName:   cfg.Postgres.DBName,
 	})
 	if err != nil {
-		logrus.Fatalf("Unable to connect db: %v", err)
+		logrus.Errorf("Unable to connect db: %v", err)
+		return
 	}
 	defer db.Close()
 
 	// Creating JWT token manager
 	tokenManager, err := auth.NewManager(cfg.Auth.SigningKey)
 	if err != nil {
-		logrus.Fatalf("Unable to create token manager: %v", err)
+		logrus.Errorf("Unable to create token manager: %v", err)
+		return
 	}
 
 	// Creating hasher
@@ -73,7 +77,7 @@ func Run(configPath string) {
 		AccessTokenTTL:  cfg.Auth.AccessTokenTTL,
 		RefreshTokenTTL: cfg.Auth.RefreshTokenTTL,
 	})
-	handlers := delivery.NewHandler(services, tokenManager)
+	handlers := handler.NewHandler(services, tokenManager)
 
 	server := server.NewServer(cfg, handlers.InitRoutes(*cfg))
 	go func() {

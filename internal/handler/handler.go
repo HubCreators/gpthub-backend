@@ -1,9 +1,9 @@
-package delivery
+package handler
 
 import (
 	_ "auth/docs"
 	"auth/internal/config"
-	v1 "auth/internal/delivery/v1"
+	v1 "auth/internal/handler/v1"
 	"auth/internal/service"
 	"auth/pkg/auth"
 	"github.com/gin-gonic/gin"

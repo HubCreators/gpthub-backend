@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/sirupsen/logrus"
 )
 
 type UsersPostgres struct {
@@ -31,9 +30,18 @@ func (r *UsersPostgres) Create(ctx context.Context, user domain.User) (int, erro
 func (r *UsersPostgres) GetByCredentials(ctx context.Context, email string, password string) (domain.User, error) {
 	query := fmt.Sprintf("SELECT id FROM %s WHERE email = $1 AND password = $2", usersCollections)
 	row := r.db.QueryRow(ctx, query, email, password)
-	logrus.Info(query, email, password)
+
 	var user domain.User
 	err := row.Scan(&user.ID)
+	return user, err
+}
+
+func (r *UsersPostgres) GetByEmail(ctx context.Context, email string) (domain.User, error) {
+	query := fmt.Sprintf("SELECT id, username, password, email FROM %s WHERE email = $1", usersCollections)
+	row := r.db.QueryRow(ctx, query, email)
+
+	var user domain.User
+	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.Email)
 	return user, err
 }
 
@@ -48,7 +56,7 @@ func (r *UsersPostgres) GetByRefreshToken(ctx context.Context, refreshToken stri
 
 func (r *UsersPostgres) SetSession(ctx context.Context, userID string, session domain.Session) error {
 	query := fmt.Sprintf("UPDATE %s SET session = ROW($1, $2) WHERE id = $3", usersCollections)
-	logrus.Info(query)
+
 	_, err := r.db.Exec(ctx, query, session.RefreshToken, session.ExpiresAt, userID)
 	return err
 }

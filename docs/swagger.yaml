@@ -57,6 +57,45 @@ info:
   title: GPT API
   version: "1.0"
 paths:
+  /api/v1/users/{message}:
+    get:
+      consumes:
+      - application/json
+      description: just a stub
+      parameters:
+      - description: any message
+        in: path
+        name: message
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.errorResponse'
+      security:
+      - UsersAuth: []
+      summary: Private stub
+      tags:
+      - stub
   /api/v1/users/auth/refresh:
     post:
       consumes:
@@ -94,7 +133,7 @@ paths:
             $ref: '#/definitions/v1.errorResponse'
       summary: User Refresh Tokens
       tags:
-      - users-gpthub-backend
+      - users-auth
   /api/v1/users/sign-in:
     post:
       consumes:
@@ -132,7 +171,7 @@ paths:
             $ref: '#/definitions/v1.errorResponse'
       summary: User SignIn
       tags:
-      - users-gpthub-backend
+      - users-auth
   /api/v1/users/sign-up:
     post:
       consumes:
@@ -170,7 +209,7 @@ paths:
             $ref: '#/definitions/v1.errorResponse'
       summary: User SignUp
       tags:
-      - users-gpthub-backend
+      - users-auth
 securityDefinitions:
   UsersAuth:
     in: header

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"auth/internal/domain"
 	"auth/internal/repository"
 	"auth/pkg/auth"
 	"auth/pkg/hash"
@@ -25,8 +26,9 @@ type Tokens struct {
 }
 
 type Users interface {
-	SignUp(ctx context.Context, inputUser UserSignUpInput) (int, error)
-	SignIn(ctx context.Context, inputUser UserSignInInput) (Tokens, error)
+	GetByEmail(ctx context.Context, email string) (domain.User, error)
+	SignUp(ctx context.Context, username string, email string, password string) (int, error)
+	SignIn(ctx context.Context, email string, password string) (Tokens, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
 }
 

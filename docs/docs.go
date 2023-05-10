@@ -16,7 +16,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/users/gpthub-backend/refresh": {
+        "/api/v1/users/auth/refresh": {
             "post": {
                 "description": "user refresh tokens",
                 "consumes": [
@@ -26,7 +26,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users-gpthub-backend"
+                    "users-auth"
                 ],
                 "summary": "User Refresh Tokens",
                 "parameters": [
@@ -84,7 +84,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users-gpthub-backend"
+                    "users-auth"
                 ],
                 "summary": "User SignIn",
                 "parameters": [
@@ -142,7 +142,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users-gpthub-backend"
+                    "users-auth"
                 ],
                 "summary": "User SignUp",
                 "parameters": [
@@ -158,6 +158,67 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/v1.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{message}": {
+            "get": {
+                "security": [
+                    {
+                        "UsersAuth": []
+                    }
+                ],
+                "description": "just a stub",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stub"
+                ],
+                "summary": "Private stub",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "any message",
+                        "name": "message",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
                         "description": "ok",
                         "schema": {
                             "type": "string"

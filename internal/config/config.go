@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
 	"time"
@@ -52,7 +51,7 @@ func Init(configDir string) (*Config, error) {
 	if err := viper.UnmarshalKey("http", &cfg.HTTP); err != nil {
 		return nil, err
 	}
-	if err := viper.UnmarshalKey("gpthub-backend", &cfg.Auth); err != nil {
+	if err := viper.UnmarshalKey("auth", &cfg.Auth); err != nil {
 		return nil, err
 	}
 	if err := viper.UnmarshalKey("postgres", &cfg.Postgres); err != nil {
@@ -61,7 +60,6 @@ func Init(configDir string) (*Config, error) {
 
 	setEnvVariables(&cfg)
 
-	logrus.Info(cfg)
 	return &cfg, nil
 }
 

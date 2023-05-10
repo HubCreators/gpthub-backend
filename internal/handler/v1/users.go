@@ -1,9 +1,9 @@
 package v1
 
 import (
-	"auth/internal/service"
+	"auth/internal/domain"
+	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -12,11 +12,11 @@ func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
 	{
 		users.POST("/sign-up", h.signUp)
 		users.POST("/sign-in", h.signIn)
-		users.POST("/gpthub-backend/refresh", h.userRefresh)
+		users.POST("/auth/refresh", h.userRefresh)
 
 		authenticated := users.Group("/", h.userIdentity)
 		{
-			authenticated.GET("/:id", h.getUser)
+			authenticated.GET("/:message", h.privateStub)
 		}
 	}
 }
@@ -28,7 +28,7 @@ type userSignUpInput struct {
 }
 
 // @Summary User SignUp
-// @Tags users-gpthub-backend
+// @Tags users-auth
 // @Description create user account
 // @ModuleID signUp
 // @Accept  json
@@ -40,19 +40,19 @@ type userSignUpInput struct {
 // @Failure default {object} errorResponse
 // @Router /api/v1/users/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
-	var input userSignUpInput // maybe change
+	var input userSignUpInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	id, err := h.services.Users.SignUp(c, service.UserSignUpInput{
-		Username: input.Username,
-		Email:    input.Email,
-		Password: input.Password,
-	})
+	id, err := h.services.Users.SignUp(c, input.Username, input.Email, input.Password)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		if errors.Is(err, domain.ErrUserAlreadyExists) {
+			newErrorResponse(c, http.StatusConflict, err.Error())
+		} else {
+			newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		}
 		return
 	}
 
@@ -72,7 +72,7 @@ type tokenResponse struct {
 }
 
 // @Summary User SignIn
-// @Tags users-gpthub-backend
+// @Tags users-auth
 // @Description user sign in
 // @ModuleID signUp
 // @Accept  json
@@ -90,10 +90,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	tokens, err := h.services.SignIn(c, service.UserSignInInput{
-		Email:    input.Email,
-		Password: input.Password,
-	})
+	tokens, err := h.services.SignIn(c, input.Email, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -110,7 +107,7 @@ type refreshInput struct {
 }
 
 // @Summary User Refresh Tokens
-// @Tags users-gpthub-backend
+// @Tags users-auth
 // @Description user refresh tokens
 // @Accept  json
 // @Produce  json
@@ -119,7 +116,7 @@ type refreshInput struct {
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/v1/users/gpthub-backend/refresh [post]
+// @Router /api/v1/users/auth/refresh [post]
 func (h *Handler) userRefresh(c *gin.Context) {
 	var input refreshInput
 	if err := c.BindJSON(&input); err != nil {
@@ -139,6 +136,21 @@ func (h *Handler) userRefresh(c *gin.Context) {
 	})
 }
 
-func (h *Handler) getUser(c *gin.Context) {
-	logrus.Info("Not implemented yet")
+// @Summary Private stub
+// @Security UsersAuth
+// @Tags stub
+// @Description just a stub
+// @ModuleID privateStub
+// @Accept  json
+// @Produce  json
+// @Param message path string true "any message"
+// @Success 200 {string} string "ok"
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/v1/users/{message} [get]
+func (h *Handler) privateStub(c *gin.Context) {
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "you get private message from path:  " + c.Param("message"),
+	})
 }

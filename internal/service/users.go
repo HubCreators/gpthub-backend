@@ -6,7 +6,6 @@ import (
 	"auth/pkg/auth"
 	"auth/pkg/hash"
 	"context"
-	"github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -30,30 +29,36 @@ func NewUsersService(repo repository.Users, hasher hash.PasswordHasher, tokenMan
 	}
 }
 
-func (s *UsersService) SignUp(ctx context.Context, inputUser UserSignUpInput) (int, error) {
-	hashedPassword, err := s.hasher.Hash(inputUser.Password)
+func (s *UsersService) GetByEmail(ctx context.Context, email string) (domain.User, error) {
+	return s.repo.GetByEmail(ctx, email)
+}
+
+func (s *UsersService) SignUp(ctx context.Context, username string, email string, password string) (int, error) {
+	if s.isUserExists(ctx, email) {
+		return 0, domain.ErrUserAlreadyExists
+	}
+
+	hashedPassword, err := s.hasher.Hash(password)
 	if err != nil {
-		logrus.Fatal("Unable to hash password")
 		return 0, err
 	}
 
 	user := domain.User{
-		Username: inputUser.Username,
-		Email:    inputUser.Email,
+		Username: username,
+		Email:    email,
 		Password: hashedPassword,
 	}
 
 	return s.repo.Create(ctx, user)
 }
 
-func (s *UsersService) SignIn(ctx context.Context, inputUser UserSignInInput) (Tokens, error) {
-	hashedPassword, err := s.hasher.Hash(inputUser.Password)
+func (s *UsersService) SignIn(ctx context.Context, email string, password string) (Tokens, error) {
+	hashedPassword, err := s.hasher.Hash(password)
 	if err != nil {
-		logrus.Fatal("Unable to hash password")
 		return Tokens{}, err
 	}
 
-	user, err := s.repo.GetByCredentials(ctx, inputUser.Email, hashedPassword)
+	user, err := s.repo.GetByCredentials(ctx, email, hashedPassword)
 
 	if err != nil {
 		return Tokens{}, err
@@ -75,7 +80,6 @@ func (s *UsersService) createSession(ctx context.Context, userId string) (Tokens
 		err    error
 	)
 
-	logrus.Info(s)
 	tokens.AccessToken, err = s.tokenManager.NewJWT(userId, s.accessTokenTTL)
 	if err != nil {
 		return tokens, err
@@ -92,8 +96,13 @@ func (s *UsersService) createSession(ctx context.Context, userId string) (Tokens
 	}
 
 	err = s.repo.SetSession(ctx, userId, session)
-	if err != nil {
-		logrus.Fatal("RED FLAG!!!")
-	}
 	return tokens, err
+}
+
+func (s *UsersService) isUserExists(ctx context.Context, email string) bool {
+	user, _ := s.GetByEmail(ctx, email)
+	if user.Username != "" {
+		return true
+	}
+	return false
 }
