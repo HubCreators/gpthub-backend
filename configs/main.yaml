@@ -1,0 +1,16 @@
+http:
+  host: localhost
+  port: 8080
+  readTimeout: 10s
+  writeTimeout: 10s
+  maxHeaderBytes: 1
+
+auth:
+  accessTokenTTL: 2h
+  refreshTokenTTL: 720h
+
+postgres:
+  host: localhost
+  port: 5432
+  username: postgres
+  dbname: gpt
