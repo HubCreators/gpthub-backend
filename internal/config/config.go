@@ -11,6 +11,7 @@ type Config struct {
 	Auth     AuthConfig
 	Postgres PostgresConfig
 	GIN      GINConfig
+	OpenAI   OpenAIConfig
 }
 
 type HTTPConfig struct {
@@ -38,6 +39,10 @@ type AuthConfig struct {
 
 type GINConfig struct {
 	Mode string
+}
+
+type OpenAIConfig struct {
+	Token string
 }
 
 func Init(configDir string) (*Config, error) {
@@ -68,4 +73,5 @@ func setEnvVariables(cfg *Config) {
 	cfg.Auth.SigningKey = os.Getenv("JWT_SIGNING_KEY")
 	cfg.Postgres.Password = os.Getenv("DB_PASSWORD")
 	cfg.GIN.Mode = os.Getenv("GIN_MODE")
+	cfg.OpenAI.Token = os.Getenv("OPEN_API_KEY")
 }

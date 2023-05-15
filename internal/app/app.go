@@ -11,6 +11,7 @@ import (
 	"auth/pkg/hash"
 	"context"
 	"github.com/joho/godotenv"
+	openai "github.com/sashabaranov/go-openai"
 	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
@@ -59,6 +60,10 @@ func Run(configPath string) {
 	}
 	defer db.Close()
 
+	// Creating chat GPT client
+	openAIClient := openai.NewClient(cfg.OpenAI.Token)
+	openAIModel := openai.GPT3Dot5Turbo
+
 	// Creating JWT token manager
 	tokenManager, err := auth.NewManager(cfg.Auth.SigningKey)
 	if err != nil {
@@ -76,8 +81,11 @@ func Run(configPath string) {
 		TokenManager:    tokenManager,
 		AccessTokenTTL:  cfg.Auth.AccessTokenTTL,
 		RefreshTokenTTL: cfg.Auth.RefreshTokenTTL,
+
+		OpenAIClient: openAIClient,
+		OpenAIModel:  openAIModel,
 	})
-	handlers := handler.NewHandler(services, tokenManager)
+	handlers := handler.NewMainHandler(services, tokenManager)
 
 	server := server.NewServer(cfg, handlers.InitRoutes(*cfg))
 	go func() {

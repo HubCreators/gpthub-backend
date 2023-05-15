@@ -6,19 +6,9 @@ import (
 	"auth/pkg/auth"
 	"auth/pkg/hash"
 	"context"
+	openai "github.com/sashabaranov/go-openai"
 	"time"
 )
-
-type UserSignUpInput struct {
-	Username string
-	Email    string
-	Password string
-}
-
-type UserSignInInput struct {
-	Email    string
-	Password string
-}
 
 type Tokens struct {
 	AccessToken  string
@@ -32,8 +22,13 @@ type Users interface {
 	RefreshTokens(ctx context.Context, refreshToken string) (Tokens, error)
 }
 
+type OpenAI interface {
+	Communicate(content string) (string, error)
+}
+
 type Services struct {
 	Users
+	OpenAI
 }
 
 type Deps struct {
@@ -42,12 +37,17 @@ type Deps struct {
 	TokenManager    auth.TokenManager
 	AccessTokenTTL  time.Duration
 	RefreshTokenTTL time.Duration
+
+	OpenAIClient *openai.Client
+	OpenAIModel  string
 }
 
 func NewService(deps Deps) *Services {
 	userService := NewUsersService(deps.Repos.Users, deps.Hasher, deps.TokenManager, deps.AccessTokenTTL, deps.RefreshTokenTTL)
+	openAIService := NewOpenAIService(deps.OpenAIClient, deps.OpenAIModel)
 
 	return &Services{
-		Users: userService,
+		Users:  userService,
+		OpenAI: openAIService,
 	}
 }

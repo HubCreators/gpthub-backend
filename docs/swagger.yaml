@@ -1,5 +1,20 @@
 basePath: /
 definitions:
+  v1.Prompt:
+    properties:
+      email:
+        maxLength: 64
+        type: string
+      payload:
+        type: string
+      username:
+        maxLength: 32
+        type: string
+    required:
+    - email
+    - payload
+    - username
+    type: object
   v1.errorResponse:
     properties:
       message:
@@ -57,17 +72,18 @@ info:
   title: GPT API
   version: "1.0"
 paths:
-  /api/v1/users/{message}:
-    get:
+  /api/v1/chat:
+    post:
       consumes:
       - application/json
-      description: just a stub
+      description: chat with OpenAI Model
       parameters:
-      - description: any message
-        in: path
-        name: message
+      - description: prompt to AI
+        in: body
+        name: input
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/v1.Prompt'
       produces:
       - application/json
       responses:
@@ -93,9 +109,9 @@ paths:
             $ref: '#/definitions/v1.errorResponse'
       security:
       - UsersAuth: []
-      summary: Private stub
+      summary: Communicate with OpenAI
       tags:
-      - stub
+      - chat
   /api/v1/users/auth/refresh:
     post:
       consumes:
