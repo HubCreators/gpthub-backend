@@ -12,16 +12,16 @@ import (
 	"net/http"
 )
 
-type Handler struct {
+type MainHandler struct {
 	services     *service.Services
 	tokenManager auth.TokenManager
 }
 
-func NewHandler(services *service.Services, tokenManager auth.TokenManager) *Handler {
-	return &Handler{services: services, tokenManager: tokenManager}
+func NewMainHandler(services *service.Services, tokenManager auth.TokenManager) *MainHandler {
+	return &MainHandler{services: services, tokenManager: tokenManager}
 }
 
-func (h *Handler) InitRoutes(cfg config.Config) *gin.Engine {
+func (h *MainHandler) InitRoutes(cfg config.Config) *gin.Engine {
 	gin.SetMode(cfg.GIN.Mode)
 	router := gin.New()
 
@@ -35,7 +35,7 @@ func (h *Handler) InitRoutes(cfg config.Config) *gin.Engine {
 	return router
 }
 
-func (h *Handler) initAPI(router *gin.Engine) {
+func (h *MainHandler) initAPI(router *gin.Engine) {
 	handlerv1 := v1.NewHandler(h.services, h.tokenManager)
 	api := router.Group("/api")
 	{

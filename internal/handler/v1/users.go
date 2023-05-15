@@ -13,11 +13,6 @@ func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
 		users.POST("/sign-up", h.signUp)
 		users.POST("/sign-in", h.signIn)
 		users.POST("/auth/refresh", h.userRefresh)
-
-		authenticated := users.Group("/", h.userIdentity)
-		{
-			authenticated.GET("/:message", h.privateStub)
-		}
 	}
 }
 
@@ -133,24 +128,5 @@ func (h *Handler) userRefresh(c *gin.Context) {
 	c.JSON(http.StatusOK, tokenResponse{
 		AccessToken:  tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
-	})
-}
-
-// @Summary Private stub
-// @Security UsersAuth
-// @Tags stub
-// @Description just a stub
-// @ModuleID privateStub
-// @Accept  json
-// @Produce  json
-// @Param message path string true "any message"
-// @Success 200 {string} string "ok"
-// @Failure 400,404 {object} errorResponse
-// @Failure 500 {object} errorResponse
-// @Failure default {object} errorResponse
-// @Router /api/v1/users/{message} [get]
-func (h *Handler) privateStub(c *gin.Context) {
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "you get private message from path:  " + c.Param("message"),
 	})
 }
