@@ -1,37 +1,9 @@
 <a name="readme-top"></a>
-<!-- PROJECT LOGO -->
-<br />
+
 <div align="center">
-<h1 align="center">gpthub-backend</h1>
-    <p align="center">
-        <a href="https://github.com/HubCreators/gpthub-backend/issues">Report Bug</a>
-        ·
-        <a href="https://github.com/HubCreators/gpthub-backend/issues">Request Feature</a>
-        <br />
-        <br />
-        <img alt="Static Badge" src="https://img.shields.io/badge/Go-v1.18-EEEEEE?logo=go&logoColor=white&labelColor=00ADD8">
-    </p>
+    <h2 align="center">gpthub-backend</h2>
+    <img align="center" alt="Static Badge" src="https://img.shields.io/badge/Go-v1.18-EEEEEE?logo=go&logoColor=white&labelColor=00ADD8">
 </div>
-
-
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li><a href="#about-the-project">About The Project</a></li>
-    <li><a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ol>
-</details>
-
-## About The Project
 
 This project is a backend implementation of a Chat GPT mirror (Monolithic Architecture)
 
