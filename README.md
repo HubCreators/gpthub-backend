@@ -1,8 +1,7 @@
 <a name="readme-top"></a>
 
 <div align="center">
-    <h2 align="center">gpthub-backend</h2>
-    <img align="center" alt="Static Badge" src="https://img.shields.io/badge/Go-v1.18-EEEEEE?logo=go&logoColor=white&labelColor=00ADD8">
+    <h1 align="center">gpthub-backend</h1>
 </div>
 
 This project is a backend implementation of a Chat GPT mirror (Monolithic Architecture)
